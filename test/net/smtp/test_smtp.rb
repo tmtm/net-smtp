@@ -658,6 +658,7 @@ module Net
       smtp.start do |conn|
         conn.send_message "test", "me@example.org", ["you@example.net", "friend@example.net"]
       end
+      assert_equal %w[you@example.net friend@example.net], @recipients
     end
 
     private

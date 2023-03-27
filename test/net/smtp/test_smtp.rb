@@ -698,7 +698,7 @@ module Net
       smtp.start do |conn|
         conn.mailfrom "me@example.org"
         assert_raise Net::SMTPMailboxPermanentlyUnavailable do
-          conn.rcptto_list ["friend@example.net", "nonexistent@example.net"]
+          conn.rcptto_list ["friend@example.net", "nonexistent@example.net"] do end
         end
       end
       assert_equal ["friend@example.net"], @recipients
@@ -709,7 +709,7 @@ module Net
       smtp = Net::SMTP.new('localhost', port)
       smtp.start do |conn|
         conn.mailfrom "me@example.org"
-        conn.rcptto_list []
+        conn.rcptto_list [] do end
       end
       assert_equal [], @recipients
     end
@@ -719,7 +719,7 @@ module Net
       smtp = Net::SMTP.new('localhost', port)
       smtp.start do |conn|
         conn.mailfrom "me@example.org"
-        conn.rcptto_list ["nonexistent1@example.net", "nonexistent2@example.net"]
+        conn.rcptto_list ["nonexistent1@example.net", "nonexistent2@example.net"] do end
       end
       assert_equal [], @recipients
     end

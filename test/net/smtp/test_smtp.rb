@@ -709,7 +709,9 @@ module Net
       smtp = Net::SMTP.new('localhost', port)
       smtp.start do |conn|
         conn.mailfrom "me@example.org"
-        conn.rcptto_list [] do end
+        assert_raise ArgumentError do
+          conn.rcptto_list [] do end
+        end
       end
       assert_equal [], @recipients
     end
@@ -719,7 +721,9 @@ module Net
       smtp = Net::SMTP.new('localhost', port)
       smtp.start do |conn|
         conn.mailfrom "me@example.org"
-        conn.rcptto_list ["nonexistent1@example.net", "nonexistent2@example.net"] do end
+        assert_raise ArgumentError do
+          conn.rcptto_list ["nonexistent1@example.net", "nonexistent2@example.net"] do end
+        end
       end
       assert_equal [], @recipients
     end

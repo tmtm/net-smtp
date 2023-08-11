@@ -731,21 +731,30 @@ module Net
             else
               sock.puts "535 5.7.8 Error: authentication failed: authentication failure\r\n"
             end
-          when /\AMAIL FROM:/, /\ARCPT TO:/
-            sock.puts "250 2.1.0 Ok\r\n"
+          when /\AMAIL FROM: *<.*>/
+            sock.puts "250 2.1.0 Okay\r\n"
+          when /\ARCPT TO: *<(.*)>/
+            if $1.start_with? "-"
+              sock.puts "501 5.1.3 Bad recipient address syntax\r\n"
+            elsif $1.start_with? "~"
+              sock.puts "400 4.0.0 Try again\r\n"
+            else
+              sock.puts "250 2.1.5 Okay\r\n"
+            end
           when "DATA"
-            sock.puts "354 End data with <CR><LF>.<CR><LF>\r\n"
-            in_data = true
-          when "."
-            sock.puts "250 2.0.0 Ok: queued as ABCDEFG\r\n"
-            in_data = false
+            sock.puts "354 Continue (finish with dot)\r\n"
+            loop do
+              line = sock.gets
+              break if line == ".\r\n"
+            end
+            sock.puts "250 2.6.0 Okay\r\n"
           when "QUIT"
             sock.puts "221 2.0.0 Bye\r\n"
             sock.close
             servers.each(&:close)
             break
           else
-            sock.puts "502 5.5.2 Error: command not recognized\r\n" unless in_data
+            sock.puts "502 5.5.2 Error: command not recognized\r\n"
           end
         end
       end

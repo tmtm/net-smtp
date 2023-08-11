@@ -652,6 +652,14 @@ module Net
       assert sock.write_io.string.include? "MAIL FROM:<rené@example.com> SMTPUTF8\r\n"
     end
 
+    def test_rcpt_to
+      port = fake_server_start
+      smtp = Net::SMTP.new('localhost', port)
+      smtp.start do |conn|
+        conn.send_message "test", "me@example.org", ["you@example.net", "friend@example.net"]
+      end
+    end
+
     private
 
     def accept(servers)
